@@ -1,6 +1,6 @@
-# 🎨 React Animated GitHub Contribution Calendar
+# 🎨 React Animated GitHub Contribution Heatempa
 
-A beautiful, animated GitHub contribution calendar React component designed specifically for Next.js and React applications. Features environment variable support, TypeScript definitions, and React hooks.
+A beautiful, animated GitHub contribution heatmap React component designed specifically for Next.js and React applications. Features environment variable support, TypeScript definitions, and React hooks.
 
 ![Demo](https://via.placeholder.com/800x400/1a1a1a/ffffff?text=React+Animated+GitHub+Contribution+Calendar)
 
@@ -22,9 +22,9 @@ A beautiful, animated GitHub contribution calendar React component designed spec
 ### Installation
 
 ```bash
-npm install react-animated-github-contribution-calendar
+npm install animated-contribution-heatmap
 # or
-yarn add react-animated-github-contribution-calendar
+yarn add animated-contribution-heatmap
 ```
 
 ### Environment Variables
@@ -44,7 +44,7 @@ GITHUB_TOKEN=your_github_token_here
 
 ```tsx
 import React from 'react';
-import { ContributionCalendar } from 'react-animated-github-contribution-calendar';
+import { ContributionCalendar } from 'animated-contribution-heatmap';
 
 function App() {
   return (
@@ -63,7 +63,7 @@ export default App;
 
 ```tsx
 import React from 'react';
-import { useGitHubContributions } from 'react-animated-github-contribution-calendar';
+import { useGitHubContributions } from 'animated-contribution-heatmap';
 
 function MyComponent() {
   const { data, loading, error, refetch } = useGitHubContributions({
@@ -180,7 +180,7 @@ You can customize the appearance using CSS variables:
 // app/page.tsx
 'use client';
 
-import { ContributionCalendar } from 'react-animated-github-contribution-calendar';
+import { ContributionCalendar } from 'animated-contribution-heatmap';
 
 export default function Home() {
   return (
@@ -199,7 +199,7 @@ export default function Home() {
 
 ```tsx
 // pages/index.tsx
-import { ContributionCalendar } from 'react-animated-github-contribution-calendar';
+import { ContributionCalendar } from 'animated-contribution-heatmap';
 
 export default function Home() {
   return (
@@ -272,8 +272,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 ### Building from Source
 
 ```bash
-git clone https://github.com/ogvaibhavshukla/react-animated-github-contribution-calendar.git
-cd react-animated-github-contribution-calendar
+git clone https://github.com/ogvaibhavshukla/animated-contribution-heatmap.git
+cd animated-contribution-heatmap
 npm install
 npm run build
 ```
@@ -305,8 +305,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## 📞 Support
 
 - 📧 Email: ogvaibhavshukla@gmail.com
-- 🐛 Issues: [GitHub Issues](https://github.com/ogvaibhavshukla/react-animated-github-contribution-calendar/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/ogvaibhavshukla/react-animated-github-contribution-calendar/discussions)
+- 🐛 Issues: [GitHub Issues](https://github.com/ogvaibhavshukla/animated-contribution-heatmap/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/ogvaibhavshukla/animated-contribution-heatmap/discussions)
 
 ## 🙏 Acknowledgments
 

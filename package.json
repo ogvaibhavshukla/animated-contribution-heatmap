@@ -1,5 +1,5 @@
 {
-  "name": "react-animated-github-contribution-calendar",
+  "name": "animated-contribution-heatmap",
   "version": "1.0.0",
   "description": "A beautiful, animated GitHub contribution calendar React component for Next.js and React applications",
   "main": "dist/index.js",
