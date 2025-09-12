@@ -1,4 +1,4 @@
-# 🎨 React Animated GitHub Contribution Heatempa
+# 🎨 React Animated GitHub Contribution Heatemap
 
 A beautiful, animated GitHub contribution heatmap React component designed specifically for Next.js and React applications. Features environment variable support, TypeScript definitions, and React hooks.
 
