@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import './ContributionCalendar.css';
 
 export interface ContributionCalendarProps {
@@ -67,18 +67,6 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ContributionData | null>(null);
-  const [lastRequestTime, setLastRequestTime] = useState(0);
-
-  // Stable callback references to prevent infinite re-renders
-  const onDataLoadRef = useRef(onDataLoad);
-  const onErrorRef = useRef(onError);
-  const isInitialMount = useRef(true);
-
-  // Update refs when callbacks change
-  useEffect(() => {
-    onDataLoadRef.current = onDataLoad;
-    onErrorRef.current = onError;
-  });
 
   // Pattern types
   const PATTERNS = {
@@ -105,29 +93,11 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
 
   // Fetch GitHub contributions
   const fetchGithubContributions = useCallback(async () => {
-    // Prevent multiple simultaneous requests
-    if (isLoading) {
+    if (!githubToken) {
+      setError('GitHub token is required');
+      setIsLoading(false);
       return;
     }
-
-    // Skip if no required credentials
-    if (!githubToken || !username) {
-      if (onErrorRef.current) {
-        onErrorRef.current(new Error('GitHub token and username are required'));
-      }
-      return;
-    }
-
-    // Rate limiting: prevent requests more frequent than once per second
-    const now = Date.now();
-    const MIN_REQUEST_INTERVAL = 1000; // 1 second
-
-    if (now - lastRequestTime < MIN_REQUEST_INTERVAL) {
-      console.log('Request throttled to prevent rate limiting');
-      return;
-    }
-
-    setLastRequestTime(now);
 
     try {
       setIsLoading(true);
@@ -164,14 +134,10 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
         })
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const result = await response.json();
 
       if (result.errors) {
-        throw new Error(result.errors[0]?.message || 'GraphQL error');
+        throw new Error(result.errors[0].message);
       }
 
       if (!result.data?.user?.contributionsCollection?.contributionCalendar?.weeks) {
@@ -213,25 +179,15 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
       };
 
       setData(contributionData);
-      
-      // Call success callback safely
-      if (onDataLoadRef.current) {
-        onDataLoadRef.current(contributionData);
-      }
-      
+      onDataLoad?.(contributionData);
       setIsLoading(false);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch GitHub data';
       setError(errorMessage);
-      
-      // Call error callback safely
-      if (onErrorRef.current) {
-        onErrorRef.current(err instanceof Error ? err : new Error(errorMessage));
-      }
-      
+      onError?.(err instanceof Error ? err : new Error(errorMessage));
       setIsLoading(false);
     }
-  }, [githubToken, username, startDate, endDate, gridRows, gridCols, isLoading, lastRequestTime]);
+  }, [githubToken, username, startDate, endDate, gridRows, gridCols, onDataLoad, onError]);
 
   // Calculate date from grid position
   const calculateDateFromGridPosition = (row: number, col: number): Date => {
@@ -284,18 +240,7 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
 
   // Initialize calendar
   useEffect(() => {
-    // Only fetch on mount and when dependencies actually change
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      fetchGithubContributions();
-    } else {
-      // Add a small delay to prevent rapid successive calls
-      const timeoutId = setTimeout(() => {
-        fetchGithubContributions();
-      }, 100);
-
-      return () => clearTimeout(timeoutId);
-    }
+    fetchGithubContributions();
   }, [fetchGithubContributions]);
 
   if (isLoading) {
