@@ -129,7 +129,8 @@ export type AnimationPattern =
   | 'rain'
   | 'spiral'
   | 'noise'
-  | 'rule30';
+  | 'rule30'
+  | 'image';
 
 export type Theme = 'light' | 'dark';
 

@@ -6,8 +6,9 @@
 // Main component
 export { default as ContributionCalendar } from './components/ContributionCalendar';
 
-// Custom hook
+// Custom hooks
 export { useGitHubContributions } from './hooks/useGitHubContributions';
+export { useAnimationPatterns } from './hooks/useAnimationPatterns';
 
 // Types
 export type {

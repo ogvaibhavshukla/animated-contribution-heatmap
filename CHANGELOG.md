@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.1.0] - 2024-09-14
+### MAJOR ADDITIONS
+- IMPLEMENTED: All 8 animation patterns (Conway's Game of Life, Waves, Spirals, Ripples, Rain, Noise, Rule 30)
+- ADDED: Interactive letter clicking to trigger animations
+- ADDED: Animation controls (start, stop, randomize, clear, show real data)
+- ADDED: useAnimationPatterns hook for animation logic
+
+### ANIMATION FEATURES
+- Conway's Game of Life cellular automaton
+- Wave pattern animations
+- Spiral motion effects  
+- Ripple propagation animations
+- Rain drop effects
+- Random noise patterns
+- Rule 30 cellular automaton
+- Smooth transitions between patterns and real data
+
+### TECHNICAL IMPROVEMENTS
+- Added AnimationPattern type definitions
+- Integrated animation state management
+- Added animation-specific CSS classes
+- Exported animation hook for external use
+
 ## [1.0.4] - 2024-09-14
 ### CRITICAL FIXES
 - FIXED: Infinite re-render loop causing excessive GitHub API requests

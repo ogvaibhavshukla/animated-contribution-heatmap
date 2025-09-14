@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import './ContributionCalendar.css';
+import { useAnimationPatterns, AnimationPattern } from '../hooks/useAnimationPatterns';
 
 export interface ContributionCalendarProps {
   /** GitHub Personal Access Token */
@@ -67,6 +68,26 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ContributionData | null>(null);
+  const [showRealData, setShowRealData] = useState(true);
+
+  // Animation hook
+  const {
+    grid: animationGrid,
+    animationState,
+    startAnimation,
+    stopAnimation,
+    changePattern,
+    resetGrid,
+    randomizeGrid
+  } = useAnimationPatterns({
+    rows: gridRows,
+    cols: gridCols,
+    animationSpeed,
+    maxGenerations,
+    onPatternChange: onAnimationStart,
+    onAnimationStart,
+    onAnimationStop
+  });
 
   // Stable callback references to prevent infinite re-renders
   const onDataLoadRef = useRef(onDataLoad);
@@ -78,28 +99,29 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
     onErrorRef.current = onError;
   }, [onDataLoad, onError]);
 
-  // Pattern types
-  const PATTERNS = {
-    GAME_OF_LIFE: 'gameOfLife',
-    RIPPLE: 'ripple',
-    WAVE: 'wave',
-    RAIN: 'rain',
-    SPIRAL: 'spiral',
-    NOISE: 'noise',
-    RULE30: 'rule30'
-  };
-
-  // Pattern mapping for letters
-  const animateLetterPatterns = [
-    PATTERNS.GAME_OF_LIFE, // A
-    PATTERNS.NOISE,        // c
-    PATTERNS.WAVE,         // t
-    PATTERNS.SPIRAL,       // i
-    PATTERNS.RULE30,       // v
-    PATTERNS.RAIN,         // i
-    PATTERNS.RIPPLE,       // t
-    PATTERNS.GAME_OF_LIFE  // y
+  // Pattern mapping for letters (8 patterns for 8 letters in "Activity")
+  const animateLetterPatterns: AnimationPattern[] = [
+    'gameOfLife', // A
+    'noise',      // c
+    'wave',       // t
+    'spiral',     // i
+    'rule30',     // v
+    'rain',       // i
+    'ripple',     // t
+    'gameOfLife'  // y (reuse Game of Life for 8th letter)
   ];
+
+  // Pattern names for tooltips
+  const patternNames: Record<AnimationPattern, string> = {
+    gameOfLife: "Conway's Game of Life",
+    ripple: "Circular Ripples",
+    wave: "Wave Pattern",
+    rain: "Rain Effect",
+    spiral: "Spiral Pattern",
+    noise: "Random Noise",
+    rule30: "Rule 30 Automaton",
+    image: "Image Pattern",
+  };
 
   // CRITICAL: Add request throttling state
   const [isFetching, setIsFetching] = useState(false);
@@ -282,10 +304,23 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
 
   // Handle letter click for animations
   const handleLetterClick = (index: number) => {
-    const pattern = animateLetterPatterns[index];
-    onAnimationStart?.(pattern);
-    // Animation logic would be implemented here
-    // For now, just trigger the callback
+    setShowRealData(false); // Switch to animation mode when clicking letters
+    const newPattern = animateLetterPatterns[index];
+
+    if (!animationState.isRunning) {
+      // Start: save baseline and run
+      startAnimation(newPattern, index);
+      return;
+    }
+
+    if (animationState.activeLetterIndex === index) {
+      // Pause: restore baseline grid (same letter clicked twice)
+      stopAnimation();
+      return;
+    }
+
+    // Switch pattern while running
+    changePattern(newPattern);
   };
 
   // CRITICAL: Initialize only once with proper dependency management
@@ -344,10 +379,11 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
           {['A', 'c', 't', 'i', 'v', 'i', 't', 'y'].map((letter, index) => (
             <span
               key={index}
-              className="cc-letter"
+              className={`cc-letter ${animationState.activeLetterIndex === index ? 'active' : ''}`}
               data-pattern={animateLetterPatterns[index]}
               data-index={index}
               onClick={() => handleLetterClick(index)}
+              title={`Click to ${animationState.activeLetterIndex === index ? "pause & restore" : "start"} ${patternNames[animateLetterPatterns[index]]}`}
             >
               {letter}
             </span>
@@ -360,7 +396,9 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
           {Array.from({ length: gridCols }, (_, col) => (
             <div key={col} className="cc-column">
               {Array.from({ length: gridRows }, (_, row) => {
-                const value = data.grid[row][col];
+                // Use animation grid if not showing real data, otherwise use GitHub data
+                const currentGrid = showRealData ? data.grid : animationGrid;
+                const value = currentGrid[row][col];
                 const dateString = getDateForGridPosition(row, col);
                 
                 let level = 0;
@@ -372,9 +410,11 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
                 }
                 
                 const contributionText = value === 1 ? 'contribution' : 'contributions';
-                const tooltip = value > 0 
-                  ? `${value} ${contributionText} on ${dateString}`
-                  : `No contributions on ${dateString}`;
+                const tooltip = showRealData 
+                  ? (value > 0 
+                      ? `${value} ${contributionText} on ${dateString}`
+                      : `No contributions on ${dateString}`)
+                  : `Cell (${row}, ${col}): ${value > 0 ? `${value} contribution${value > 1 ? 's' : ''}` : "No contributions"}`;
                 
                 return (
                   <div
@@ -398,6 +438,36 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
         <p>
           <strong>{data.username}</strong> on GitHub
         </p>
+        {!showRealData && (
+          <div className="cc-animation-status">
+            <p>
+              <strong>Animation:</strong> {patternNames[animationState.currentPattern]} 
+              {animationState.isRunning ? ` (Running - Gen ${animationState.generation})` : ' (Paused)'}
+            </p>
+            <div className="cc-controls">
+              <button 
+                onClick={randomizeGrid}
+                className="cc-control-btn"
+                disabled={animationState.isRunning}
+              >
+                Randomize
+              </button>
+              <button 
+                onClick={resetGrid}
+                className="cc-control-btn"
+                disabled={animationState.isRunning}
+              >
+                Clear
+              </button>
+              <button 
+                onClick={() => setShowRealData(true)}
+                className="cc-control-btn"
+              >
+                Show Real Data
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

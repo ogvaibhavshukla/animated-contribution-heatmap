@@ -302,3 +302,70 @@
     height: 12px;
   }
 }
+
+/* Animation status */
+.contribution-calendar-container .cc-animation-status {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--cc-container-light);
+  border: 2px solid var(--cc-border-light);
+  border-radius: 8px;
+  transition: all 0.5s ease-in-out;
+}
+
+.contribution-calendar-container.dark .cc-animation-status {
+  background-color: var(--cc-container-dark);
+  border-color: var(--cc-border-dark);
+}
+
+.contribution-calendar-container .cc-animation-status p {
+  margin: 0 0 0.75rem 0;
+  font-weight: 500;
+}
+
+/* Animation controls */
+.contribution-calendar-container .cc-controls {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.contribution-calendar-container .cc-control-btn {
+  padding: 0.5rem 1rem;
+  background-color: var(--cc-blue-light);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.contribution-calendar-container .cc-control-btn:hover:not(:disabled) {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.contribution-calendar-container .cc-control-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.contribution-calendar-container .cc-control-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.contribution-calendar-container.dark .cc-control-btn {
+  background-color: var(--cc-blue-dark);
+}
+
+.contribution-calendar-container.dark .cc-control-btn:hover:not(:disabled) {
+  background-color: #3b82f6;
+}
+
+.contribution-calendar-container.dark .cc-control-btn:disabled {
+  background-color: #6b7280;
+}
