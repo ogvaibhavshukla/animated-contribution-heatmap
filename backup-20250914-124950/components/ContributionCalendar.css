@@ -1,0 +1,304 @@
+/* 🎨 React Animated GitHub Contribution Calendar - Component Styles */
+
+/* CSS Variables scoped to the component */
+.contribution-calendar-container {
+  --cc-bg-light: #ffffff;
+  --cc-bg-dark: #070707;
+  --cc-text-light: #1f2937;
+  --cc-text-dark: #f0f6fc;
+  --cc-border-light: #d1d5db;
+  --cc-border-dark: #201f22;
+  --cc-container-light: #ffffff;
+  --cc-container-dark: #070707;
+  --cc-square-empty-light: #ebedf0;
+  --cc-square-empty-dark: #201f22;
+  --cc-toggle-bg-light: #e5e7eb;
+  --cc-toggle-bg-dark: #201f22;
+  --cc-blue-light: #3b82f6;
+  --cc-blue-dark: #60a5fa;
+  --cc-square-size: 14px;
+  --cc-gap-size: 3px;
+}
+
+/* Base component container */
+.contribution-calendar-container {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--cc-bg-light);
+  color: var(--cc-text-light);
+  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.contribution-calendar-container.dark {
+  background-color: var(--cc-bg-dark);
+  color: var(--cc-text-dark);
+}
+
+/* Reset box-sizing for all child elements */
+.contribution-calendar-container *,
+.contribution-calendar-container *::before,
+.contribution-calendar-container *::after {
+  box-sizing: border-box;
+}
+
+/* Header section */
+.contribution-calendar-container .cc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.contribution-calendar-container .cc-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 2rem;
+  user-select: none;
+  transition: color 0.5s ease-in-out;
+  margin: 0;
+  letter-spacing: -0.14em;
+  font-variation-settings: 'wght' 600;
+}
+
+.contribution-calendar-container .cc-letter {
+  cursor: pointer;
+  transition: color 0.5s ease-in-out;
+}
+
+.contribution-calendar-container .cc-letter:hover {
+  color: var(--cc-blue-light);
+}
+
+.contribution-calendar-container .cc-letter.active {
+  color: var(--cc-blue-light);
+}
+
+.contribution-calendar-container.dark .cc-letter:hover {
+  color: var(--cc-blue-dark);
+}
+
+.contribution-calendar-container.dark .cc-letter.active {
+  color: var(--cc-blue-dark);
+}
+
+/* Calendar container */
+.contribution-calendar-container .cc-calendar-container {
+  background-color: var(--cc-container-light);
+  border-radius: 8px;
+  margin-top: 12px;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  transition: background-color 0.5s ease-in-out;
+}
+
+.contribution-calendar-container.dark .cc-calendar-container {
+  background-color: var(--cc-container-dark);
+}
+
+/* Grid container */
+.contribution-calendar-container .cc-grid-container {
+  display: flex;
+  border: 2px solid var(--cc-border-light);
+  border-radius: 8px;
+  padding: 8px;
+  gap: var(--cc-gap-size);
+  background-color: var(--cc-container-light);
+  transition: all 0.5s ease-in-out;
+}
+
+.contribution-calendar-container.dark .cc-grid-container {
+  border-color: var(--cc-border-dark);
+  background-color: var(--cc-container-dark);
+}
+
+.contribution-calendar-container .cc-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cc-gap-size);
+}
+
+/* Grid squares */
+.contribution-calendar-container .cc-square {
+  width: var(--cc-square-size);
+  height: var(--cc-square-size);
+  background-color: var(--cc-square-empty-light);
+  border-radius: 2.5px;
+  transition: background-color 0.5s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.contribution-calendar-container.dark .cc-square {
+  background-color: var(--cc-square-empty-dark);
+}
+
+/* Light mode contribution levels */
+.contribution-calendar-container .cc-square.alive-1 {
+  background-color: #9be9a8;
+}
+
+.contribution-calendar-container .cc-square.alive-2 {
+  background-color: #40c463;
+}
+
+.contribution-calendar-container .cc-square.alive-3 {
+  background-color: #30a14e;
+}
+
+.contribution-calendar-container .cc-square.alive-4 {
+  background-color: #216e39;
+}
+
+/* Dark mode contribution levels */
+.contribution-calendar-container.dark .cc-square.alive-1 {
+  background-color: #0e4429;
+}
+
+.contribution-calendar-container.dark .cc-square.alive-2 {
+  background-color: #006d32;
+}
+
+.contribution-calendar-container.dark .cc-square.alive-3 {
+  background-color: #26a641;
+}
+
+.contribution-calendar-container.dark .cc-square.alive-4 {
+  background-color: #39d353;
+}
+
+/* Animation classes */
+.contribution-calendar-container .cc-square.birth {
+  animation: cc-cellBirth 0.3s ease-out;
+}
+
+.contribution-calendar-container .cc-square.death {
+  animation: cc-cellDeath 0.3s ease-out;
+}
+
+@keyframes cc-cellBirth {
+  0% {
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes cc-cellDeath {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Stats section */
+.contribution-calendar-container .cc-stats {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--cc-text-light);
+}
+
+.contribution-calendar-container.dark .cc-stats {
+  color: var(--cc-text-dark);
+}
+
+.contribution-calendar-container .cc-stats p {
+  margin: 0.25rem 0;
+}
+
+/* Loading state */
+.contribution-calendar-container .cc-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.contribution-calendar-container .cc-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--cc-border-light);
+  border-top: 3px solid var(--cc-blue-light);
+  border-radius: 50%;
+  animation: cc-spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.contribution-calendar-container.dark .cc-spinner {
+  border-color: var(--cc-border-dark);
+  border-top-color: var(--cc-blue-dark);
+}
+
+@keyframes cc-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error state */
+.contribution-calendar-container .cc-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  color: #dc2626;
+}
+
+.contribution-calendar-container .cc-retry-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--cc-blue-light);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.contribution-calendar-container .cc-retry-btn:hover {
+  background-color: #2563eb;
+}
+
+.contribution-calendar-container.dark .cc-retry-btn {
+  background-color: var(--cc-blue-dark);
+}
+
+.contribution-calendar-container.dark .cc-retry-btn:hover {
+  background-color: #3b82f6;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .contribution-calendar-container {
+    padding: 1rem;
+  }
+  
+  .contribution-calendar-container .cc-title {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+  
+  .contribution-calendar-container .cc-square {
+    width: 12px;
+    height: 12px;
+  }
+}

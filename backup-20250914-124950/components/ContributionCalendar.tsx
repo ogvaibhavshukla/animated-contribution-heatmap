@@ -67,16 +67,18 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ContributionData | null>(null);
+  const [lastRequestTime, setLastRequestTime] = useState(0);
 
   // Stable callback references to prevent infinite re-renders
   const onDataLoadRef = useRef(onDataLoad);
   const onErrorRef = useRef(onError);
+  const isInitialMount = useRef(true);
 
-  // Update refs when callbacks change - prevent infinite loops
+  // Update refs when callbacks change
   useEffect(() => {
     onDataLoadRef.current = onDataLoad;
     onErrorRef.current = onError;
-  }, [onDataLoad, onError]);
+  });
 
   // Pattern types
   const PATTERNS = {
@@ -101,27 +103,14 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
     PATTERNS.GAME_OF_LIFE  // y
   ];
 
-  // CRITICAL: Add request throttling state
-  const [isFetching, setIsFetching] = useState(false);
-  const lastRequestTimeRef = useRef(0);
-
-  // Fetch GitHub contributions - FIXED: Remove problematic dependencies
+  // Fetch GitHub contributions
   const fetchGithubContributions = useCallback(async () => {
-    const now = Date.now();
-    
-    // CRITICAL: Prevent multiple simultaneous requests
-    if (isFetching) {
-      console.log('THROTTLED: Request already in progress, skipping...');
+    // Prevent multiple simultaneous requests
+    if (isLoading) {
       return;
     }
-    
-    // CRITICAL: Rate limiting protection (1 second minimum)
-    if (now - lastRequestTimeRef.current < 1000) {
-      console.log('THROTTLED: Request throttled to prevent rate limiting');
-      return;
-    }
-    
-    // CRITICAL: Validate required credentials
+
+    // Skip if no required credentials
     if (!githubToken || !username) {
       if (onErrorRef.current) {
         onErrorRef.current(new Error('GitHub token and username are required'));
@@ -129,8 +118,16 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
       return;
     }
 
-    setIsFetching(true);
-    lastRequestTimeRef.current = now;
+    // Rate limiting: prevent requests more frequent than once per second
+    const now = Date.now();
+    const MIN_REQUEST_INTERVAL = 1000; // 1 second
+
+    if (now - lastRequestTime < MIN_REQUEST_INTERVAL) {
+      console.log('Request throttled to prevent rate limiting');
+      return;
+    }
+
+    setLastRequestTime(now);
 
     try {
       setIsLoading(true);
@@ -217,7 +214,7 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
 
       setData(contributionData);
       
-      // CRITICAL: Use ref callback to prevent dependency issues
+      // Call success callback safely
       if (onDataLoadRef.current) {
         onDataLoadRef.current(contributionData);
       }
@@ -227,17 +224,14 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch GitHub data';
       setError(errorMessage);
       
-      // CRITICAL: Use ref callback for error handling
+      // Call error callback safely
       if (onErrorRef.current) {
         onErrorRef.current(err instanceof Error ? err : new Error(errorMessage));
       }
       
       setIsLoading(false);
-    } finally {
-      setIsFetching(false);
     }
-  }, [githubToken, username, startDate, endDate, gridRows, gridCols]);
-  // CRITICAL NOTE: isLoading and lastRequestTime REMOVED from dependencies
+  }, [githubToken, username, startDate, endDate, gridRows, gridCols, isLoading, lastRequestTime]);
 
   // Calculate date from grid position
   const calculateDateFromGridPosition = (row: number, col: number): Date => {
@@ -288,17 +282,19 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
     // For now, just trigger the callback
   };
 
-  // CRITICAL: Initialize only once with proper dependency management
-  const hasInitialized = useRef(false);
-
+  // Initialize calendar
   useEffect(() => {
-    if (!hasInitialized.current) {
-      hasInitialized.current = true;
-      // CRITICAL: Small delay prevents race conditions
-      const timer = setTimeout(() => {
+    // Only fetch on mount and when dependencies actually change
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      fetchGithubContributions();
+    } else {
+      // Add a small delay to prevent rapid successive calls
+      const timeoutId = setTimeout(() => {
         fetchGithubContributions();
       }, 100);
-      return () => clearTimeout(timer);
+
+      return () => clearTimeout(timeoutId);
     }
   }, [fetchGithubContributions]);
 
