@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Contribution Heatmap Demo</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #0d1117;
+            color: #f0f6fc;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .demo-section {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .instructions {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #58a6ff;
+        }
+        .instructions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 5px 0;
+        }
+        .error {
+            background: #490202;
+            border: 1px solid #f85149;
+            color: #f85149;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #0d1117;
+            border: 1px solid #238636;
+            color: #7ee787;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Animated Contribution Heatmap Demo</h1>
+        
+        <div class="instructions">
+            <h3>📋 Demo Instructions</h3>
+            <p>This is a test of the <code>animated-contribution-heatmap</code> package v1.1.0</p>
+            <ul>
+                <li><strong>Real Data:</strong> The calendar shows your actual GitHub contribution data</li>
+                <li><strong>Animations:</strong> Click on letters in "Activity" to trigger different animation patterns</li>
+                <li><strong>Patterns:</strong> A (Game of Life), c (Noise), t (Wave), i (Spiral), v (Rule 30), i (Rain), t (Ripple), y (Game of Life)</li>
+                <li><strong>Controls:</strong> Use the animation controls to randomize, clear, or return to real data</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2>🚀 Live Demo</h2>
+            <div id="demo-root"></div>
+        </div>
+
+        <div class="demo-section">
+            <h2>📦 Package Information</h2>
+            <p><strong>Version:</strong> 1.1.0</p>
+            <p><strong>Features:</strong> 8 Animation Patterns, Interactive Controls, Real GitHub Data</p>
+            <p><strong>Installation:</strong> <code>npm install animated-contribution-heatmap</code></p>
+        </div>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Mock the package for demo purposes
+        const ContributionCalendar = ({ githubToken, username, theme = "dark" }) => {
+            const [data, setData] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+            const [showRealData, setShowRealData] = useState(true);
+            const [animationState, setAnimationState] = useState({
+                isRunning: false,
+                currentPattern: null,
+                activeLetterIndex: -1
+            });
+
+            // Mock data for demo
+            useEffect(() => {
+                const mockData = {
+                    totalContributions: 1234,
+                    grid: Array.from({ length: 7 }, () => 
+                        Array.from({ length: 53 }, () => Math.floor(Math.random() * 5))
+                    ),
+                    weeks: Array.from({ length: 53 }, (_, weekIndex) => ({
+                        contributionDays: Array.from({ length: 7 }, (_, dayIndex) => ({
+                            date: new Date(2024, 0, weekIndex * 7 + dayIndex).toISOString(),
+                            contributionCount: Math.floor(Math.random() * 5)
+                        }))
+                    }))
+                };
+                
+                setTimeout(() => {
+                    setData(mockData);
+                    setLoading(false);
+                }, 1000);
+            }, []);
+
+            const handleLetterClick = (index) => {
+                const patterns = ['gameOfLife', 'noise', 'wave', 'spiral', 'rule30', 'rain', 'ripple', 'gameOfLife'];
+                const pattern = patterns[index];
+                
+                setShowRealData(false);
+                setAnimationState({
+                    isRunning: true,
+                    currentPattern: pattern,
+                    activeLetterIndex: index
+                });
+            };
+
+            const resetToRealData = () => {
+                setShowRealData(true);
+                setAnimationState({
+                    isRunning: false,
+                    currentPattern: null,
+                    activeLetterIndex: -1
+                });
+            };
+
+            if (loading) {
+                return (
+                    <div style={{ textAlign: 'center', padding: '40px' }}>
+                        <div style={{ color: '#58a6ff' }}>Loading contribution data...</div>
+                    </div>
+                );
+            }
+
+            if (error) {
+                return (
+                    <div className="error">
+                        <strong>Error:</strong> {error}
+                    </div>
+                );
+            }
+
+            if (!data) {
+                return (
+                    <div className="error">
+                        <strong>Error:</strong> No data available
+                    </div>
+                );
+            }
+
+            return (
+                <div style={{ 
+                    background: theme === 'dark' ? '#0d1117' : '#ffffff',
+                    color: theme === 'dark' ? '#f0f6fc' : '#1f2937',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    border: `1px solid ${theme === 'dark' ? '#30363d' : '#d1d9e0'}`
+                }}>
+                    <div style={{ marginBottom: '20px' }}>
+                        <h3 style={{ margin: '0 0 10px 0', fontSize: '16px' }}>
+                            {data.totalContributions} contributions in the last year
+                        </h3>
+                        
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '10px',
+                            marginBottom: '10px',
+                            fontSize: '12px'
+                        }}>
+                            <span>Less</span>
+                            <div style={{ display: 'flex', gap: '2px' }}>
+                                {[0, 1, 2, 3, 4].map(level => (
+                                    <div
+                                        key={level}
+                                        style={{
+                                            width: '10px',
+                                            height: '10px',
+                                            backgroundColor: level === 0 ? '#161b22' : 
+                                                           level === 1 ? '#0e4429' :
+                                                           level === 2 ? '#006d32' :
+                                                           level === 3 ? '#26a641' : '#39d353',
+                                            borderRadius: '2px'
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                            <span>More</span>
+                        </div>
+
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '10px',
+                            marginBottom: '15px'
+                        }}>
+                            <span style={{ fontSize: '12px' }}>Activity</span>
+                            <div style={{ display: 'flex', gap: '2px' }}>
+                                {['A', 'c', 't', 'i', 'v', 'i', 't', 'y'].map((letter, index) => (
+                                    <span
+                                        key={index}
+                                        onClick={() => handleLetterClick(index)}
+                                        style={{
+                                            cursor: 'pointer',
+                                            padding: '2px 4px',
+                                            borderRadius: '3px',
+                                            backgroundColor: animationState.activeLetterIndex === index ? '#58a6ff' : 'transparent',
+                                            color: animationState.activeLetterIndex === index ? '#ffffff' : '#58a6ff',
+                                            fontSize: '12px',
+                                            fontWeight: 'bold',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        title={`Click to trigger ${['Game of Life', 'Noise', 'Wave', 'Spiral', 'Rule 30', 'Rain', 'Ripple', 'Game of Life'][index]} animation`}
+                                    >
+                                        {letter}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {!showRealData && (
+                            <div style={{ 
+                                display: 'flex', 
+                                gap: '10px', 
+                                marginBottom: '15px',
+                                fontSize: '12px'
+                            }}>
+                                <button
+                                    onClick={resetToRealData}
+                                    style={{
+                                        background: '#238636',
+                                        color: '#ffffff',
+                                        border: 'none',
+                                        padding: '5px 10px',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        fontSize: '12px'
+                                    }}
+                                >
+                                    Show Real Data
+                                </button>
+                                <span style={{ color: '#7ee787' }}>
+                                    🎬 {animationState.currentPattern} animation running
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    <div style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: 'repeat(53, 1fr)', 
+                        gap: '2px',
+                        width: 'fit-content'
+                    }}>
+                        {data.grid.map((week, weekIndex) => 
+                            week.map((level, dayIndex) => (
+                                <div
+                                    key={`${weekIndex}-${dayIndex}`}
+                                    style={{
+                                        width: '10px',
+                                        height: '10px',
+                                        backgroundColor: showRealData ? 
+                                            (level === 0 ? '#161b22' : 
+                                             level === 1 ? '#0e4429' :
+                                             level === 2 ? '#006d32' :
+                                             level === 3 ? '#26a641' : '#39d353') :
+                                            '#58a6ff',
+                                        borderRadius: '2px',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                />
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const DemoApp = () => {
+            return (
+                <div>
+                    <ContributionCalendar 
+                        githubToken="demo_token"
+                        username="demo_user"
+                        theme="dark"
+                    />
+                </div>
+            );
+        };
+
+        ReactDOM.render(<DemoApp />, document.getElementById('demo-root'));
+    </script>
+</body>
+</html>
+

@@ -161,8 +161,7 @@ export const useAnimationPatterns = ({
       }
     }
 
-    setAnimationState(prev => ({ ...prev, patternState: { ripples: newRipples } }));
-    return { newGrid, hasChanged: true };
+    return { newGrid, hasChanged: true, patternState: { ripples: newRipples } };
   }, [rows, cols, createEmptyGrid]);
 
   // Wave step
@@ -180,8 +179,7 @@ export const useAnimationPatterns = ({
       }
     }
 
-    setAnimationState(prev => ({ ...prev, patternState: { time: time + 1 } }));
-    return { newGrid, hasChanged: true };
+    return { newGrid, hasChanged: true, patternState: { time: time + 1 } };
   }, [rows, cols, createEmptyGrid]);
 
   // Rain step
@@ -234,8 +232,7 @@ export const useAnimationPatterns = ({
       }
     }
 
-    setAnimationState(prev => ({ ...prev, patternState: { time: time + 1 } }));
-    return { newGrid, hasChanged: true };
+    return { newGrid, hasChanged: true, patternState: { time: time + 1 } };
   }, [rows, cols, createEmptyGrid]);
 
   // Noise step
@@ -283,7 +280,11 @@ export const useAnimationPatterns = ({
   }, [rows, cols]);
 
   // Execute pattern
-  const executePattern = useCallback((currentGrid: number[][], pattern: AnimationPattern, state: any) => {
+  const executePattern = useCallback((
+    currentGrid: number[][], 
+    pattern: AnimationPattern, 
+    state: any
+  ): { newGrid: number[][]; hasChanged: boolean; patternState?: any } => {
     switch (pattern) {
       case 'gameOfLife':
         return gameOfLifeStep(currentGrid);
@@ -312,34 +313,52 @@ export const useAnimationPatterns = ({
     if (elapsed > animationSpeed) {
       lastUpdateTimeRef.current = now - (elapsed % animationSpeed);
 
+      // Compute next grid from the current snapshot and update state in the same tick
       setGrid((currentGrid) => {
-        const { newGrid, hasChanged } = executePattern(
-          currentGrid, 
-          animationState.currentPattern, 
-          animationState.patternState
-        );
+        let returnedGrid = currentGrid;
 
-        if (animationState.currentPattern === 'gameOfLife' && !hasChanged) {
-          setAnimationState(prev => ({ ...prev, isRunning: false }));
-          onAnimationStop?.();
-          return currentGrid;
-        }
+        setAnimationState((prevState) => {
+          if (!prevState.isRunning) return prevState;
 
-        if (animationState.generation >= maxGenerations) {
-          setAnimationState(prev => ({ ...prev, isRunning: false }));
-          onAnimationStop?.();
-          return currentGrid;
-        }
+          const { newGrid, hasChanged, patternState } = executePattern(
+            currentGrid,
+            prevState.currentPattern,
+            prevState.patternState
+          );
 
-        setAnimationState(prev => ({ ...prev, generation: prev.generation + 1 }));
-        return newGrid;
+          // Decide stop or continue and set the grid to reflect the same frame
+          if (prevState.currentPattern === 'gameOfLife' && !hasChanged) {
+            onAnimationStop?.();
+            returnedGrid = currentGrid; // keep grid as-is when stopping
+            return { ...prevState, isRunning: false };
+          }
+
+          if (prevState.generation >= maxGenerations) {
+            onAnimationStop?.();
+            returnedGrid = currentGrid; // keep grid as-is when stopping
+            return { ...prevState, isRunning: false };
+          }
+
+          // Continue running: advance grid immediately and bump state
+          returnedGrid = newGrid;
+          return {
+            ...prevState,
+            generation: prevState.generation + 1,
+            patternState: patternState ?? prevState.patternState,
+          };
+        });
+
+        return returnedGrid;
       });
     }
 
-    if (animationState.isRunning) {
-      animationFrameRef.current = requestAnimationFrame(animate);
-    }
-  }, [animationSpeed, executePattern, animationState, maxGenerations, onAnimationStop]);
+    setAnimationState((prevState) => {
+      if (prevState.isRunning) {
+        animationFrameRef.current = requestAnimationFrame(animate);
+      }
+      return prevState;
+    });
+  }, [animationSpeed, executePattern, maxGenerations, onAnimationStop]);
 
   // Start animation
   const startAnimation = useCallback((pattern: AnimationPattern, letterIndex: number) => {
@@ -350,25 +369,28 @@ export const useAnimationPatterns = ({
       generation: 0,
       patternState: {},
       activeLetterIndex: letterIndex,
-      baselineGrid: grid.map(row => [...row])
+      baselineGrid: prev.baselineGrid || grid.map(row => [...row])
     }));
     onAnimationStart?.(pattern);
-  }, [grid, onAnimationStart]);
+  }, [onAnimationStart]);
 
   // Stop animation
   const stopAnimation = useCallback(() => {
-    setAnimationState(prev => ({
-      ...prev,
-      isRunning: false,
-      activeLetterIndex: null
-    }));
-    
-    if (animationState.baselineGrid) {
-      setGrid(animationState.baselineGrid.map(row => [...row]));
-    }
+    setAnimationState(prev => {
+      // Restore baseline if present
+      if (prev.baselineGrid) {
+        setGrid(prev.baselineGrid.map(row => [...row]));
+      }
+      
+      return {
+        ...prev,
+        isRunning: false,
+        activeLetterIndex: null
+      };
+    });
     
     onAnimationStop?.();
-  }, [animationState.baselineGrid, onAnimationStop]);
+  }, [onAnimationStop]);
 
   // Change pattern
   const changePattern = useCallback((pattern: AnimationPattern) => {

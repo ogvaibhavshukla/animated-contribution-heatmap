@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.1] - 2025-09-16
+### Fixed
+- Animation loop now updates the grid in the same frame without setTimeout, eliminating a one-frame visual delay and simplifying control flow
+- Centralized patternState handling in the loop (no state writes inside pattern functions)
+- Safer start/stop behavior: baseline captured via functional update; restore without stale reads
+- Debounced letter clicks (120 ms) to avoid rapid pattern thrashing
+- onAnimationStart typed as `(pattern: AnimationPattern)` for TS safety
+
+### Verification
+- Verified all 7 patterns start/stop/switch smoothly
+- Confirmed RAF scheduling only while running; Game of Life halts on stability
+- Lint passes; build emits CJS/ESM/DTS; CSS extracted
+
 ## [1.1.0] - 2024-09-14
 ### MAJOR ADDITIONS
 - IMPLEMENTED: All 8 animation patterns (Conway's Game of Life, Waves, Spirals, Ripples, Rain, Noise, Rule 30)

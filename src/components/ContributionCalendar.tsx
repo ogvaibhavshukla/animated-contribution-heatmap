@@ -28,7 +28,7 @@ export interface ContributionCalendarProps {
   /** Custom CSS class name */
   className?: string;
   /** Callback when animation starts */
-  onAnimationStart?: (pattern: string) => void;
+  onAnimationStart?: (pattern: AnimationPattern) => void;
   /** Callback when animation stops */
   onAnimationStop?: () => void;
   /** Callback when data is loaded */
@@ -69,6 +69,7 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ContributionData | null>(null);
   const [showRealData, setShowRealData] = useState(true);
+  const letterClickDebounceRef = useRef<number | null>(null);
 
   // Animation hook
   const {
@@ -304,6 +305,17 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
 
   // Handle letter click for animations
   const handleLetterClick = (index: number) => {
+    // 120ms debounce to prevent excessive rapid switches
+    if (letterClickDebounceRef.current) {
+      return;
+    }
+    letterClickDebounceRef.current = window.setTimeout(() => {
+      if (letterClickDebounceRef.current) {
+        window.clearTimeout(letterClickDebounceRef.current);
+        letterClickDebounceRef.current = null;
+      }
+    }, 120);
+
     setShowRealData(false); // Switch to animation mode when clicking letters
     const newPattern = animateLetterPatterns[index];
 
@@ -316,6 +328,7 @@ const ContributionCalendar: React.FC<ContributionCalendarProps> = ({
     if (animationState.activeLetterIndex === index) {
       // Pause: restore baseline grid (same letter clicked twice)
       stopAnimation();
+      setShowRealData(true); // Auto-return to GitHub data
       return;
     }
 

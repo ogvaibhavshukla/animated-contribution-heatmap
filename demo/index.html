@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Contribution Heatmap - Live Demo</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            color: #f0f6fc;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #58a6ff, #7ee787);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #8b949e;
+            margin-bottom: 20px;
+        }
+        
+        .version-badge {
+            display: inline-block;
+            background: #238636;
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        
+        .demo-section {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .instructions {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #58a6ff;
+            font-size: 1.3rem;
+        }
+        
+        .instructions ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 8px 0;
+            color: #c9d1d9;
+        }
+        
+        .pattern-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .pattern-item {
+            background: #21262d;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 3px solid #58a6ff;
+            font-size: 0.9rem;
+        }
+        
+        .pattern-item strong {
+            color: #7ee787;
+        }
+        
+        .error {
+            background: #490202;
+            border: 1px solid #f85149;
+            color: #f85149;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .success {
+            background: #0d1117;
+            border: 1px solid #238636;
+            color: #7ee787;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .package-info {
+            background: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .package-info h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+        }
+        
+        .package-info code {
+            background: #21262d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #7ee787;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+        }
+        
+        .footer a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Animated Contribution Heatmap</h1>
+            <p>Interactive GitHub contribution calendar with 8 stunning animation patterns</p>
+            <div class="version-badge">v1.1.0</div>
+        </div>
+        
+        <div class="instructions">
+            <h3>🎮 How to Use This Demo</h3>
+            <p>This is a live demonstration of the <code>animated-contribution-heatmap</code> package. The component below shows mock GitHub contribution data with working animations.</p>
+            
+            <h4>✨ Interactive Features:</h4>
+            <ul>
+                <li><strong>Real Data Display:</strong> The calendar shows simulated GitHub contribution data</li>
+                <li><strong>Letter Animations:</strong> Click on letters in "Activity" to trigger different animation patterns</li>
+                <li><strong>Animation Controls:</strong> Use the controls to manage animations and return to real data</li>
+                <li><strong>Theme Support:</strong> Dark theme optimized for developer portfolios</li>
+            </ul>
+            
+            <h4>🎨 Animation Patterns:</h4>
+            <div class="pattern-list">
+                <div class="pattern-item"><strong>A</strong> - Conway's Game of Life</div>
+                <div class="pattern-item"><strong>c</strong> - Random Noise Pattern</div>
+                <div class="pattern-item"><strong>t</strong> - Wave Animation</div>
+                <div class="pattern-item"><strong>i</strong> - Spiral Motion</div>
+                <div class="pattern-item"><strong>v</strong> - Rule 30 Automaton</div>
+                <div class="pattern-item"><strong>i</strong> - Rain Effect</div>
+                <div class="pattern-item"><strong>t</strong> - Ripple Propagation</div>
+                <div class="pattern-item"><strong>y</strong> - Game of Life (Final)</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>🚀 Live Demo</h2>
+            <div id="demo-root"></div>
+        </div>
+
+        <div class="package-info">
+            <h3>📦 Package Information</h3>
+            <p><strong>Version:</strong> 1.1.0</p>
+            <p><strong>Installation:</strong> <code>npm install animated-contribution-heatmap</code></p>
+            <p><strong>Features:</strong> 8 Animation Patterns, Interactive Controls, Real GitHub Data, TypeScript Support</p>
+            <p><strong>Repository:</strong> <a href="https://github.com/ogvaibhavshukla/react-animated-github-contribution-calendar" target="_blank">GitHub</a></p>
+            <p><strong>NPM:</strong> <a href="https://www.npmjs.com/package/animated-contribution-heatmap" target="_blank">npmjs.com/package/animated-contribution-heatmap</a></p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Made with ❤️ by <a href="https://github.com/ogvaibhavshukla" target="_blank">Vaibhav Shukla</a></p>
+        <p>© 2024 Animated Contribution Heatmap. MIT License.</p>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Mock animation patterns for demo
+        const createAnimationGrid = (pattern, rows, cols, generation) => {
+            const grid = Array.from({ length: rows }, () => Array.from({ length: cols }, () => 0));
+            
+            switch (pattern) {
+                case 'gameOfLife':
+                    // Conway's Game of Life pattern
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            const x = (i + generation) % rows;
+                            const y = (j + generation) % cols;
+                            if ((x + y) % 3 === 0 || (x * y) % 7 === 0) {
+                                grid[i][j] = Math.floor(Math.random() * 4) + 1;
+                            }
+                        }
+                    }
+                    break;
+                case 'noise':
+                    // Random noise pattern
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            grid[i][j] = Math.random() > 0.7 ? Math.floor(Math.random() * 4) + 1 : 0;
+                        }
+                    }
+                    break;
+                case 'wave':
+                    // Wave pattern
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            const wave = Math.sin((j + generation * 0.5) * 0.3) * Math.cos((i + generation * 0.3) * 0.2);
+                            if (wave > 0.3) {
+                                grid[i][j] = Math.floor(Math.abs(wave) * 4) + 1;
+                            }
+                        }
+                    }
+                    break;
+                case 'spiral':
+                    // Spiral pattern
+                    const centerX = rows / 2;
+                    const centerY = cols / 2;
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            const angle = Math.atan2(i - centerX, j - centerY) + generation * 0.2;
+                            const radius = Math.sqrt((i - centerX) ** 2 + (j - centerY) ** 2);
+                            if (Math.abs(radius - angle * 2) < 3) {
+                                grid[i][j] = Math.floor(Math.random() * 4) + 1;
+                            }
+                        }
+                    }
+                    break;
+                case 'rule30':
+                    // Rule 30 cellular automaton
+                    if (generation === 0) {
+                        grid[Math.floor(rows / 2)][Math.floor(cols / 2)] = 4;
+                    } else {
+                        for (let i = 1; i < rows - 1; i++) {
+                            for (let j = 1; j < cols - 1; j++) {
+                                const left = grid[i - 1][j - 1] > 0 ? 1 : 0;
+                                const center = grid[i - 1][j] > 0 ? 1 : 0;
+                                const right = grid[i - 1][j + 1] > 0 ? 1 : 0;
+                                const rule = left ^ (center | right);
+                                if (rule) {
+                                    grid[i][j] = Math.floor(Math.random() * 4) + 1;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                case 'rain':
+                    // Rain effect
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            const drop = Math.sin((j + generation * 2) * 0.5) > 0.8;
+                            if (drop && (i + generation) % 3 === 0) {
+                                grid[i][j] = Math.floor(Math.random() * 4) + 1;
+                            }
+                        }
+                    }
+                    break;
+                case 'ripple':
+                    // Ripple effect
+                    const rippleCenterX = rows / 2;
+                    const rippleCenterY = cols / 2;
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            const distance = Math.sqrt((i - rippleCenterX) ** 2 + (j - rippleCenterY) ** 2);
+                            const ripple = Math.sin((distance - generation * 2) * 0.5);
+                            if (Math.abs(ripple) < 0.3) {
+                                grid[i][j] = Math.floor(Math.abs(ripple) * 4) + 1;
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    // Default pattern
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            grid[i][j] = Math.random() > 0.8 ? Math.floor(Math.random() * 4) + 1 : 0;
+                        }
+                    }
+            }
+            
+            return grid;
+        };
+
+        const ContributionCalendar = ({ githubToken, username, theme = "dark" }) => {
+            const [data, setData] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [error, setError] = useState(null);
+            const [showRealData, setShowRealData] = useState(true);
+            const [animationState, setAnimationState] = useState({
+                isRunning: false,
+                currentPattern: null,
+                activeLetterIndex: -1
+            });
+            const [generation, setGeneration] = useState(0);
+            const animationRef = useRef(null);
+
+            const rows = 7;
+            const cols = 53;
+
+            // Mock data for demo
+            useEffect(() => {
+                const mockData = {
+                    totalContributions: 1234,
+                    grid: Array.from({ length: rows }, () => 
+                        Array.from({ length: cols }, () => Math.floor(Math.random() * 5))
+                    ),
+                    weeks: Array.from({ length: cols }, (_, weekIndex) => ({
+                        contributionDays: Array.from({ length: rows }, (_, dayIndex) => ({
+                            date: new Date(2024, 0, weekIndex * 7 + dayIndex).toISOString(),
+                            contributionCount: Math.floor(Math.random() * 5)
+                        }))
+                    }))
+                };
+                
+                setTimeout(() => {
+                    setData(mockData);
+                    setLoading(false);
+                }, 1000);
+            }, []);
+
+            // Animation loop
+            useEffect(() => {
+                if (animationState.isRunning) {
+                    animationRef.current = setInterval(() => {
+                        setGeneration(prev => prev + 1);
+                    }, 200);
+                } else {
+                    if (animationRef.current) {
+                        clearInterval(animationRef.current);
+                        animationRef.current = null;
+                    }
+                }
+
+                return () => {
+                    if (animationRef.current) {
+                        clearInterval(animationRef.current);
+                    }
+                };
+            }, [animationState.isRunning]);
+
+            const handleLetterClick = (index) => {
+                const patterns = ['gameOfLife', 'noise', 'wave', 'spiral', 'rule30', 'rain', 'ripple', 'gameOfLife'];
+                const pattern = patterns[index];
+                
+                setShowRealData(false);
+                setGeneration(0);
+                setAnimationState({
+                    isRunning: true,
+                    currentPattern: pattern,
+                    activeLetterIndex: index
+                });
+            };
+
+            const resetToRealData = () => {
+                setShowRealData(true);
+                setAnimationState({
+                    isRunning: false,
+                    currentPattern: null,
+                    activeLetterIndex: -1
+                });
+                setGeneration(0);
+            };
+
+            const randomizeGrid = () => {
+                if (data) {
+                    const newGrid = Array.from({ length: rows }, () => 
+                        Array.from({ length: cols }, () => Math.floor(Math.random() * 5))
+                    );
+                    setData(prev => ({ ...prev, grid: newGrid }));
+                }
+            };
+
+            if (loading) {
+                return (
+                    <div style={{ textAlign: 'center', padding: '40px' }}>
+                        <div style={{ color: '#58a6ff', fontSize: '1.2rem' }}>Loading contribution data...</div>
+                    </div>
+                );
+            }
+
+            if (error) {
+                return (
+                    <div className="error">
+                        <strong>Error:</strong> {error}
+                    </div>
+                );
+            }
+
+            if (!data) {
+                return (
+                    <div className="error">
+                        <strong>Error:</strong> No data available
+                    </div>
+                );
+            }
+
+            const currentGrid = showRealData ? 
+                data.grid : 
+                createAnimationGrid(animationState.currentPattern, rows, cols, generation);
+
+            return (
+                <div style={{ 
+                    background: theme === 'dark' ? '#0d1117' : '#ffffff',
+                    color: theme === 'dark' ? '#f0f6fc' : '#1f2937',
+                    padding: '30px',
+                    borderRadius: '12px',
+                    border: `1px solid ${theme === 'dark' ? '#30363d' : '#d1d9e0'}`,
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+                }}>
+                    <div style={{ marginBottom: '25px' }}>
+                        <h3 style={{ margin: '0 0 15px 0', fontSize: '1.5rem', color: '#f0f6fc' }}>
+                            {data.totalContributions} contributions in the last year
+                        </h3>
+                        
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '15px',
+                            marginBottom: '15px',
+                            fontSize: '14px',
+                            color: '#8b949e'
+                        }}>
+                            <span>Less</span>
+                            <div style={{ display: 'flex', gap: '3px' }}>
+                                {[0, 1, 2, 3, 4].map(level => (
+                                    <div
+                                        key={level}
+                                        style={{
+                                            width: '12px',
+                                            height: '12px',
+                                            backgroundColor: level === 0 ? '#161b22' : 
+                                                           level === 1 ? '#0e4429' :
+                                                           level === 2 ? '#006d32' :
+                                                           level === 3 ? '#26a641' : '#39d353',
+                                            borderRadius: '3px'
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                            <span>More</span>
+                        </div>
+
+                        <div style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '15px',
+                            marginBottom: '20px'
+                        }}>
+                            <span style={{ fontSize: '14px', color: '#8b949e' }}>Activity</span>
+                            <div style={{ display: 'flex', gap: '3px' }}>
+                                {['A', 'c', 't', 'i', 'v', 'i', 't', 'y'].map((letter, index) => (
+                                    <span
+                                        key={index}
+                                        onClick={() => handleLetterClick(index)}
+                                        style={{
+                                            cursor: 'pointer',
+                                            padding: '6px 8px',
+                                            borderRadius: '6px',
+                                            backgroundColor: animationState.activeLetterIndex === index ? '#58a6ff' : 'transparent',
+                                            color: animationState.activeLetterIndex === index ? '#ffffff' : '#58a6ff',
+                                            fontSize: '14px',
+                                            fontWeight: 'bold',
+                                            transition: 'all 0.3s ease',
+                                            border: `1px solid ${animationState.activeLetterIndex === index ? '#58a6ff' : 'transparent'}`
+                                        }}
+                                        title={`Click to trigger ${['Game of Life', 'Noise', 'Wave', 'Spiral', 'Rule 30', 'Rain', 'Ripple', 'Game of Life'][index]} animation`}
+                                    >
+                                        {letter}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {!showRealData && (
+                            <div style={{ 
+                                display: 'flex', 
+                                gap: '15px', 
+                                marginBottom: '20px',
+                                fontSize: '14px',
+                                alignItems: 'center'
+                            }}>
+                                <button
+                                    onClick={resetToRealData}
+                                    style={{
+                                        background: '#238636',
+                                        color: '#ffffff',
+                                        border: 'none',
+                                        padding: '8px 16px',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.background = '#2ea043'}
+                                    onMouseOut={(e) => e.target.style.background = '#238636'}
+                                >
+                                    Show Real Data
+                                </button>
+                                <button
+                                    onClick={randomizeGrid}
+                                    style={{
+                                        background: '#21262d',
+                                        color: '#f0f6fc',
+                                        border: '1px solid #30363d',
+                                        padding: '8px 16px',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontSize: '14px',
+                                        fontWeight: '600',
+                                        transition: 'all 0.2s ease'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.background = '#30363d'}
+                                    onMouseOut={(e) => e.target.style.background = '#21262d'}
+                                >
+                                    Randomize
+                                </button>
+                                <span style={{ color: '#7ee787', fontSize: '14px' }}>
+                                    🎬 {animationState.currentPattern} animation running
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    <div style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: 'repeat(53, 1fr)', 
+                        gap: '3px',
+                        width: 'fit-content',
+                        margin: '0 auto'
+                    }}>
+                        {currentGrid.map((week, weekIndex) => 
+                            week.map((level, dayIndex) => (
+                                <div
+                                    key={`${weekIndex}-${dayIndex}`}
+                                    style={{
+                                        width: '12px',
+                                        height: '12px',
+                                        backgroundColor: showRealData ? 
+                                            (level === 0 ? '#161b22' : 
+                                             level === 1 ? '#0e4429' :
+                                             level === 2 ? '#006d32' :
+                                             level === 3 ? '#26a641' : '#39d353') :
+                                            '#58a6ff',
+                                        borderRadius: '3px',
+                                        transition: 'all 0.3s ease',
+                                        opacity: showRealData ? 1 : 0.8 + (Math.random() * 0.2)
+                                    }}
+                                />
+                            ))
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const DemoApp = () => {
+            return (
+                <div>
+                    <ContributionCalendar 
+                        githubToken="demo_token"
+                        username="demo_user"
+                        theme="dark"
+                    />
+                </div>
+            );
+        };
+
+        ReactDOM.render(<DemoApp />, document.getElementById('demo-root'));
+    </script>
+</body>
+</html>
+

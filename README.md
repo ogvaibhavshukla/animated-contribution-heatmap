@@ -2,7 +2,11 @@
 
 A beautiful, animated GitHub contribution heatmap React component designed specifically for Next.js and React applications. Features environment variable support, TypeScript definitions, and React hooks.
 
-![Demo](https://via.placeholder.com/800x400/1a1a1a/ffffff?text=React+Animated+GitHub+Contribution+Calendar)
+## 🎮 Live Demo
+
+[**Try the Interactive Demo**](./demo/index.html) - Click letters in "Activity" to see all 8 animation patterns in action!
+
+> **Note:** The demo uses mock data to showcase all animation features. In your app, it will display your real GitHub contribution data.
 
 ## ✨ Features
 

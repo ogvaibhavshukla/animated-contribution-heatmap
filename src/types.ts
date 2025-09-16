@@ -28,7 +28,7 @@ export interface ContributionCalendarProps {
   /** Custom CSS class name */
   className?: string;
   /** Callback when animation starts */
-  onAnimationStart?: (pattern: string) => void;
+  onAnimationStart?: (pattern: AnimationPattern) => void;
   /** Callback when animation stops */
   onAnimationStop?: () => void;
   /** Callback when data is loaded */
