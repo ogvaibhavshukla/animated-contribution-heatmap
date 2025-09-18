@@ -40,12 +40,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ogvaibhavshukla/react-animated-github-contribution-calendar.git"
+    "url": "git+https://github.com/ogvaibhavshukla/animated-contribution-heatmap.git"
   },
   "bugs": {
-    "url": "https://github.com/ogvaibhavshukla/react-animated-github-contribution-calendar/issues"
+    "url": "https://github.com/ogvaibhavshukla/animated-contribution-heatmap/issues"
   },
-  "homepage": "https://github.com/ogvaibhavshukla/react-animated-github-contribution-calendar#readme",
+  "homepage": "https://www.npmjs.com/package/animated-contribution-heatmap?activeTab=readme",
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
